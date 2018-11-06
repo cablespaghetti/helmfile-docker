@@ -13,7 +13,7 @@ LABEL version="${HELMFILE_VERSION}-${HELM_VERSION}-${KUBECTL_VERSION}"
 
 WORKDIR /
 
-RUN apk --update --no-cache add bash ca-certificates git gnupg curl
+RUN apk --update --no-cache add bash ca-certificates git gnupg curl gettext
 
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
