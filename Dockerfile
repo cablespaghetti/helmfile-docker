@@ -1,10 +1,10 @@
-FROM alpine:3.8
+FROM alpine:3.9
 
-ARG KUBECTL_VERSION=1.11.7
-ARG HELM_VERSION=2.13.0
+ARG KUBECTL_VERSION=1.12.7
+ARG HELM_VERSION=2.13.1
 ARG HELM_DIFF_VERSION=master
 ARG HELM_SECRETS_VERSION=master
-ARG HELMFILE_VERSION=0.46.2
+ARG HELMFILE_VERSION=0.53.2
 
 ENV HELM_FILE_NAME helm-v${HELM_VERSION}-linux-amd64.tar.gz
 
@@ -17,7 +17,7 @@ RUN apk --update --no-cache add bash ca-certificates git gnupg curl gettext
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 
-ADD https://amazon-eks.s3-us-west-2.amazonaws.com/1.11.5/2018-12-06/bin/linux/amd64/aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+ADD https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
 RUN chmod +x /usr/local/bin/aws-iam-authenticator
 
 ADD http://storage.googleapis.com/kubernetes-helm/${HELM_FILE_NAME} /tmp
