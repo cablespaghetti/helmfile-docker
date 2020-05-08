@@ -1,7 +1,7 @@
 FROM alpine:3.11
 
-ARG KUBECTL_VERSION=1.15.11
-ARG HELM_VERSION=3.2.0
+ARG KUBECTL_VERSION=1.15.12
+ARG HELM_VERSION=3.2.1
 ARG HELM_DIFF_VERSION=3.1.1
 ARG HELM_SECRETS_VERSION=2.0.2
 ARG HELMFILE_VERSION=0.114.0
@@ -25,7 +25,7 @@ RUN tar -zxvf /tmp/helm* -C /tmp \
 
 RUN helm plugin install https://github.com/databus23/helm-diff --version ${HELM_DIFF_VERSION} && \
     helm plugin install https://github.com/futuresimple/helm-secrets --version ${HELM_SECRETS_VERSION} && \
-    helm plugin install https://github.com/hypnoglow/helm-s3.git --version ${HELM_S3_VERSION}
+    helm plugin install https://github.com/hypnoglow/helm-s3.git --version ${HELM_S3_VERSION} && \
     helm plugin install https://github.com/aslafy-z/helm-git --version ${HELM_GIT_VERSION}
 
 ADD https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64 /bin/helmfile
