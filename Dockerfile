@@ -14,6 +14,7 @@ RUN apk --update --no-cache add bash ca-certificates git gnupg curl gettext py3-
 
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
+RUN kubectl version --client
 
 ADD https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
 RUN chmod +x /usr/local/bin/aws-iam-authenticator
@@ -23,6 +24,7 @@ ADD https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz /tmp
 RUN tar -zxvf /tmp/helm* -C /tmp \
   && mv /tmp/linux-amd64/helm /bin/helm \
   && rm -rf /tmp/*
+RUN helm version
 
 RUN helm plugin install https://github.com/databus23/helm-diff --version ${HELM_DIFF_VERSION} && \
     helm plugin install https://github.com/futuresimple/helm-secrets --version ${HELM_SECRETS_VERSION} && \
@@ -31,5 +33,6 @@ RUN helm plugin install https://github.com/databus23/helm-diff --version ${HELM_
 
 ADD https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64 /bin/helmfile
 RUN chmod 0755 /bin/helmfile
+RUN helmfile version
 
 ENTRYPOINT ["/bin/helmfile"]
