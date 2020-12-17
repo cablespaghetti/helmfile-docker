@@ -1,24 +1,31 @@
 FROM hashicorp/terraform:0.13.5 AS terraform
 
-FROM alpine:3.12
+FROM debian:buster-slim
 
-ARG KUBECTL_VERSION=1.17.12
-ARG HELM_VERSION=3.3.4
+ARG KUBECTL_VERSION=1.18.9
+ARG HELM_VERSION=3.4.2
 ARG HELM_DIFF_VERSION=3.1.3
 ARG HELM_SECRETS_VERSION=2.0.2
-ARG HELMFILE_VERSION=0.130.1
-ARG HELM_S3_VERSION=0.9.2
-ARG HELM_GIT_VERSION=0.8.1
+ARG HELMFILE_VERSION=0.135.0
+ARG HELM_S3_VERSION=0.10.0
+ARG HELM_GIT_VERSION=0.10.0
 
 WORKDIR /
 
-RUN apk --update --no-cache add bash ca-certificates git gnupg curl gettext py3-pip jq && pip install gitpython~=2.1.11 requests~=2.22.0 PyYAML~=5.1.1 awscli
+RUN apt-get update && apt-get install -y git gnupg curl gettext jq unzip sudo
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.1.12.zip" -o "awscliv2.zip" \
+  && unzip awscliv2.zip \
+  && ./aws/install \
+  && rm -rf aws awscliv2.zip \
+  && rm -rf ./aws \
+  && rm -rf /var/lib/apt/lists
+RUN aws --version
 
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 RUN kubectl version --client
 
-ADD https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+ADD https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
 RUN chmod +x /usr/local/bin/aws-iam-authenticator
 RUN aws-iam-authenticator version
 
