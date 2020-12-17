@@ -1,3 +1,5 @@
+FROM hashicorp/terraform:0.13.5 AS terraform
+
 FROM alpine:3.12
 
 ARG KUBECTL_VERSION=1.17.12
@@ -34,5 +36,8 @@ RUN helm plugin install https://github.com/databus23/helm-diff --version ${HELM_
 ADD https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64 /bin/helmfile
 RUN chmod 0755 /bin/helmfile
 RUN helmfile version
+
+COPY --from=terraform /bin/terraform /bin/terraform
+RUN terraform version
 
 ENTRYPOINT ["/bin/helmfile"]
