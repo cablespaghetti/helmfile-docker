@@ -1,4 +1,4 @@
-FROM hashicorp/terraform:0.13.5 AS terraform
+FROM hashicorp/terraform:0.14.3 AS terraform
 
 FROM debian:buster-slim
 
@@ -12,15 +12,16 @@ ARG HELM_GIT_VERSION=0.8.1
 
 WORKDIR /
 
-RUN apt-get update && apt-get install -y git gnupg curl gettext jq unzip sudo
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.1.12.zip" -o "awscliv2.zip" \
+RUN apt-get update && apt-get install -y git gnupg curl gettext jq unzip sudo python3-pip
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.1.19.zip" -o "awscliv2.zip" \
   && unzip awscliv2.zip \
   && ./aws/install \
   && rm -rf aws awscliv2.zip \
   && rm -rf ./aws \
   && rm -rf /var/lib/apt/lists
 RUN aws --version
-
+RUN pip3 install ec2instanceconnectcli
+RUN mssh -h
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 RUN kubectl version --client
