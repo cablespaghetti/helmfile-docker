@@ -1,5 +1,3 @@
-FROM hashicorp/terraform:0.15.1 AS terraform
-
 FROM debian:buster-slim
 
 ARG KUBECTL_VERSION=1.23.0
@@ -9,8 +7,10 @@ ARG HELM_SECRETS_VERSION=3.12.0
 ARG HELMFILE_VERSION=0.144.0
 ARG HELM_S3_VERSION=0.10.0
 ARG HELM_GIT_VERSION=0.11.1
-ARG AWS_CLI_VERSION=2.2.0
+ARG AWS_CLI_VERSION=2.5.2
 ARG SOPS_VERSION=3.7.2
+ARG TERRAFORM_VERSION=1.1.7
+ARG AWS_IAM_AUTHENTICATOR_VERSION=0.5.5
 
 WORKDIR /
 
@@ -28,13 +28,13 @@ ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION
 RUN chmod +x /usr/local/bin/kubectl
 RUN kubectl version --client
 
-ADD https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+ADD https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v${AWS_IAM_AUTHENTICATOR_VERSION}/aws-iam-authenticator_${AWS_IAM_AUTHENTICATOR_VERSION}_linux_amd64 /usr/local/bin/aws-iam-authenticator
 RUN chmod +x /usr/local/bin/aws-iam-authenticator
 RUN aws-iam-authenticator version
 
 ADD https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz /tmp
 RUN tar -zxvf /tmp/helm* -C /tmp \
-  && mv /tmp/linux-amd64/helm /bin/helm \
+  && mv /tmp/linux-amd64/helm /usr/local/bin/helm \
   && rm -rf /tmp/*
 RUN helm version
 
@@ -43,15 +43,18 @@ RUN helm plugin install https://github.com/databus23/helm-diff --version ${HELM_
     helm plugin install https://github.com/hypnoglow/helm-s3.git --version ${HELM_S3_VERSION} && \
     helm plugin install https://github.com/aslafy-z/helm-git --version ${HELM_GIT_VERSION}
 
-ADD https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64 /bin/helmfile
-RUN chmod 0755 /bin/helmfile
+ADD https://github.com/roboll/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_linux_amd64 /usr/local/bin/helmfile
+RUN chmod 0755 /usr/local/bin/helmfile
 RUN helmfile version
 
-COPY --from=terraform /bin/terraform /bin/terraform
-RUN terraform version
+ADD https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip terraform.zip
+RUN unzip terraform.zip \
+  && rm terraform.zip \
+  && mv terraform /usr/local/bin/terraform \
+  && terraform version
 
-ADD https://github.com/mozilla/sops/releases/download/v3.7.2/sops-v3.7.2.linux /usr/local/bin/sops
+ADD https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux /usr/local/bin/sops
 RUN chmod +x /usr/local/bin/sops
 RUN sops --version
 
-ENTRYPOINT ["/bin/helmfile"]
+ENTRYPOINT ["/usr/local/bin/helmfile"]
