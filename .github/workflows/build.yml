@@ -49,7 +49,7 @@ jobs:
             type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-,suffix=-${{ env.timestamp }},event=branch
+            type=sha,prefix={{branch}}-,suffix=-${{ env.timestamp }},enable=${{ startsWith(github.ref, 'refs/heads/') }}
       -
         name: Build and push
         uses: docker/build-push-action@v2
