@@ -2,14 +2,15 @@ FROM hashicorp/terraform:0.15.1 AS terraform
 
 FROM debian:buster-slim
 
-ARG KUBECTL_VERSION=1.20.6
-ARG HELM_VERSION=3.5.4
-ARG HELM_DIFF_VERSION=3.1.3
-ARG HELM_SECRETS_VERSION=3.6.1
-ARG HELMFILE_VERSION=0.138.7
+ARG KUBECTL_VERSION=1.23.0
+ARG HELM_VERSION=3.8.1
+ARG HELM_DIFF_VERSION=3.4.2
+ARG HELM_SECRETS_VERSION=3.12.0
+ARG HELMFILE_VERSION=0.144.0
 ARG HELM_S3_VERSION=0.10.0
-ARG HELM_GIT_VERSION=0.8.1
+ARG HELM_GIT_VERSION=0.11.1
 ARG AWS_CLI_VERSION=2.2.0
+ARG SOPS_VERSION=3.7.2
 
 WORKDIR /
 
@@ -48,5 +49,9 @@ RUN helmfile version
 
 COPY --from=terraform /bin/terraform /bin/terraform
 RUN terraform version
+
+ADD https://github.com/mozilla/sops/releases/download/v3.7.2/sops-v3.7.2.linux /usr/local/bin/sops
+RUN chmod +x /usr/local/bin/sops
+RUN sops --version
 
 ENTRYPOINT ["/bin/helmfile"]
